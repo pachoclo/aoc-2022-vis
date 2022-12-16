@@ -15,5 +15,10 @@
   },
   "dependencies": {
     "three": "^0.147.0"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "semi": false,
+    "printWidth": 80
   }
 }

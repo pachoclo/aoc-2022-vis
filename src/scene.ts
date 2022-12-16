@@ -1,10 +1,12 @@
 import {
   AmbientLight,
+  BasicShadowMap,
   BoxGeometry,
   Clock,
   GridHelper,
   Mesh,
   MeshLambertMaterial,
+  OrthographicCamera,
   PCFSoftShadowMap,
   PerspectiveCamera,
   PlaneGeometry,
@@ -13,18 +15,30 @@ import {
   WebGLRenderer,
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import * as animations from './animations'
 import { resizeRendererToDisplaySize } from './helpers/responsiveness'
 import './style.css'
 import Stats from 'three/examples/jsm/libs/stats.module'
 
 const CANVAS_ID = 'scene'
 
-const cubeGeometry = new BoxGeometry(1, 1, 1)
-const cubeMaterial = new MeshLambertMaterial({ color: 'magenta' })
-const cube = new Mesh(cubeGeometry, cubeMaterial)
+const gridHeight = 10
+const gridWidth = 10
 
-const planeGeometry = new PlaneGeometry(3, 3)
+const cubeGeometry = new BoxGeometry(0.8, 0.8, 0.8)
+const cubeMaterial = new MeshLambertMaterial({ color: 'bluegray' })
+
+function makeCube() {
+  const cube = new Mesh(cubeGeometry, cubeMaterial)
+  cube.castShadow = true
+  cube.receiveShadow = true
+  return cube
+}
+
+const cubeGrid = Array(gridHeight)
+  .fill(null)
+  .map((_) => Array(gridWidth).fill(null).map(makeCube))
+
+const planeGeometry = new PlaneGeometry(gridWidth + 2, gridHeight + 2)
 const planeMaterial = new MeshLambertMaterial({
   color: 'gray',
   emissive: 'teal',
@@ -32,13 +46,13 @@ const planeMaterial = new MeshLambertMaterial({
   side: 2,
 })
 const plane = new Mesh(planeGeometry, planeMaterial)
+const gridColor = 'hotpink'
+const grid = new GridHelper(10, 10, gridColor, gridColor)
 
-const grid = new GridHelper(20, 20, 'teal', 'darkgray')
+const ambientLight = new AmbientLight('white', 0.5)
+const pointLight = new PointLight('#ffdca8', 0.8, 100)
 
-const ambientLight = new AmbientLight('white', 0.4)
-const pointLight = new PointLight('#ffdca8', 1.2, 100)
-
-const camera = new PerspectiveCamera(50, 2, 0.1, 200)
+const camera = new PerspectiveCamera(50, 2, 0.1, 400)
 
 const canvas: HTMLElement = document.querySelector(`canvas#${CANVAS_ID}`)!
 
@@ -47,7 +61,7 @@ const cameraControls = new OrbitControls(camera, canvas)
 const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true })
 renderer.setPixelRatio(window.devicePixelRatio)
 
-const clock = new Clock()
+// const clock = new Clock()
 
 const scene = new Scene()
 
@@ -59,31 +73,38 @@ animate()
 
 function init() {
   // position and rotation
-  camera.position.set(3.5, 3, 5)
-  plane.rotateX(Math.PI / 2)
-  pointLight.position.set(-5, 3, 3)
+  pointLight.position.set(-5, 3, 4)
+  grid.rotateX(Math.PI / 2)
+  cubeGrid.forEach((row, r) =>
+    row.forEach((cube, c) => cube.position.set(c + 0.5, -r - 0.5, 0.5))
+  )
+  camera.position.set(gridHeight / 2, -(gridHeight / 2), gridHeight * 1.5)
+  plane.translateX(gridWidth / 2)
+  plane.translateY(-gridHeight / 2)
+  grid.translateX(gridWidth / 2)
+  grid.translateZ(gridWidth / 2)
+  grid.translateY(0.1)
 
   // shadows
   renderer.shadowMap.enabled = true
-  renderer.shadowMap.type = PCFSoftShadowMap
+  renderer.shadowMap.type = BasicShadowMap
   pointLight.castShadow = true
   pointLight.shadow.radius = 4
   pointLight.shadow.camera.near = 0.1
-  pointLight.shadow.mapSize.width = 5000
-  pointLight.shadow.mapSize.height = 5000
-  cube.castShadow = true
+  pointLight.shadow.mapSize.width = 2000
+  pointLight.shadow.mapSize.height = 2000
   plane.receiveShadow = true
 
   // add objects and lights to scene
   scene.add(grid)
   scene.add(plane)
-  scene.add(cube)
   scene.add(ambientLight)
   scene.add(pointLight)
+  cubeGrid.forEach((row) => row.forEach((cube) => scene.add(cube)))
 
-  // set the camera to look at the cube's starting position
-  const { x: ctrlTargetX, y: ctrlTargetY, z: ctrlTargetZ } = cube.position
-  cameraControls.target.set(ctrlTargetX, ctrlTargetY, ctrlTargetZ)
+  // set camera looking at origin
+  cameraControls.target.setX(gridWidth / 2)
+  cameraControls.target.setY(-(gridHeight / 2))
   cameraControls.update()
 
   // stats
@@ -96,8 +117,6 @@ function animate() {
   stats.update()
 
   // animation
-  animations.rotate(cube, clock, Math.PI / 3)
-  animations.bounce(cube, clock, 1, 0.5, 0.5)
 
   // responsiveness
   if (resizeRendererToDisplaySize(renderer)) {
