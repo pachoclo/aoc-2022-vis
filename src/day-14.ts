@@ -9,7 +9,6 @@ import {
   PerspectiveCamera,
   PointLight,
   Scene,
-  SphereGeometry,
   WebGLRenderer,
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
@@ -216,6 +215,8 @@ const camera = new PerspectiveCamera(50, 2, 0.1, 400)
 const canvas: HTMLElement = document.querySelector(`canvas#${CANVAS_ID}`)!
 
 const cameraControls = new OrbitControls(camera, canvas)
+cameraControls.autoRotate = true
+cameraControls.autoRotateSpeed = 3
 
 const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true })
 renderer.setPixelRatio(window.devicePixelRatio)
@@ -366,7 +367,7 @@ function animate() {
 
   stats.update()
 
-  if (clock.getElapsedTime() > lastTick + 0.0000000000000001) {
+  if (clock.getElapsedTime() > lastTick + 0.0001) {
     lastTick = clock.getElapsedTime()
 
     if (!attemptToMove(sandGrain)) {
@@ -374,6 +375,8 @@ function animate() {
       scene.add(sandGrain)
     }
   }
+
+  cameraControls.update()
 
   if (resizeRendererToDisplaySize(renderer)) {
     // responsiveness
