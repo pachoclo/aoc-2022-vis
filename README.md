@@ -2,4 +2,4 @@
 
 Attempt at making Three.js visualizations of selected AoC 2022 problems
 
-[Demo 👉 ](https://aoc-2022-vis.vercel.app/)
+[Demo 👈](https://aoc-2022-vis.vercel.app/)
