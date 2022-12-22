@@ -4,10 +4,7 @@ import {
   Box3,
   Box3Helper,
   BoxGeometry,
-  BoxHelper,
-  Clock,
   Group,
-  LineSegments,
   Mesh,
   MeshStandardMaterial,
   PerspectiveCamera,
@@ -15,7 +12,6 @@ import {
   PointLightHelper,
   Scene,
   WebGLRenderer,
-  WireframeGeometry,
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import Stats from 'three/examples/jsm/libs/stats.module'
@@ -38,7 +34,6 @@ let camera: PerspectiveCamera
 let cameraControls: OrbitControls
 let pointLightHelper: PointLightHelper
 let pointLightHelperTwo: PointLightHelper
-let clock: Clock
 
 init()
 animate()
@@ -141,7 +136,6 @@ function init() {
 
   // ===== 📈 STATS & CLOCK =====
   {
-    clock = new Clock()
     stats = Stats()
 
     // document.body.appendChild(stats.dom)
