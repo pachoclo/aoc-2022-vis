@@ -1,4 +1,4 @@
-import { input as _, sampleInput } from './input'
+import { input, sampleInput as _ } from './input'
 
 export async function partOne() {
   const cubes = parseCubes()
@@ -30,7 +30,7 @@ export type Point = {
 }
 
 export function parseCubes(): Point[] {
-  const cubes: Point[] = sampleInput.split('\n').map((line) => {
+  const cubes: Point[] = input.split('\n').map((line) => {
     const [x, y, z] = line.split(',').map((str) => Number.parseInt(str))
     return { x, y, z }
   })
