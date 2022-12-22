@@ -1,4 +1,4 @@
-import { input } from './input'
+import { input as _, sampleInput } from './input'
 
 export async function partOne() {
   const cubes = parseCubes()
@@ -30,7 +30,7 @@ export type Point = {
 }
 
 export function parseCubes(): Point[] {
-  const cubes: Point[] = input.split('\n').map((line) => {
+  const cubes: Point[] = sampleInput.split('\n').map((line) => {
     const [x, y, z] = line.split(',').map((str) => Number.parseInt(str))
     return { x, y, z }
   })
@@ -81,13 +81,6 @@ export function calculateBoundingBox(cubes: Point[]) {
   const maxY = ySorted.at(-1)!
   const minZ = zSorted.at(0)!
   const maxZ = zSorted.at(-1)!
-
-  console.log(minX)
-  console.log(maxX)
-  console.log(minY)
-  console.log(maxY)
-  console.log(minZ)
-  console.log(maxZ)
 
   return [minX, maxX, minY, maxY, minZ, maxZ]
 }
